@@ -123,6 +123,8 @@ workflows:
     jobs:
       - build
       - ui-tests:
+          requires:
+            - build
           filters:
             branches:
               only: /^.*ui_tests.*/
