@@ -91,7 +91,7 @@ jobs:
     environment:
       # Customize the JVM maximum heap limit
       MAVEN_OPTS: -Xmx1024m
-      MAVEN_CONFIG: "-s ~/.circleci/.circleci.settings.xml"
+      MAVEN_CONFIG: "-s .circleci/.circleci.settings.xml"
 
     steps:
       - checkout
@@ -101,8 +101,13 @@ jobs:
             - v2-dependencies-
             - dot-vaadin
 
-      - run: ./mvnw -N install
-      - run: ./mvnw -Prelease-flow install -DskipTests -DskipVertxRun=true
+      - run:
+          name: "Setup custom environment variables"
+          command: echo "export MAVEN_CONFIG='-s $CIRCLE_WORKING_DIRECTORY/.circleci/.circleci.settings.xml'" >> $BASH_ENV
+
+      - run:
+          name: "Install artifacts"
+          command: ./mvnw -N install && ./mvnw -Prelease-flow install -DskipTests -DskipVertxRun=true
       - run: >
           cd vertx-vaadin-flow-parent/vertx-vaadin-tests/test-root-context &&
           ~/mvnw -Dfailsafe.rerunFailingTestsCount=3 -DverticleStartTimeout=60000 verify
