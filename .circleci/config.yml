@@ -91,7 +91,7 @@ jobs:
     environment:
       # Customize the JVM maximum heap limit
       MAVEN_OPTS: -Xmx1024m
-      MAVEN_CONFIG: "-s .circleci/.circleci.settings.xml"
+      MAVEN_CONFIG: "-s $(pwd)/.circleci/.circleci.settings.xml"
     steps:
       - checkout
       - restore_cache:
@@ -99,7 +99,9 @@ jobs:
             - v2-dependencies-{{ checksum "pom.xml" }}
             - v2-dependencies-
             - dot-vaadin
-      - run: cd vertx-vaadin-flow-parent/vertx-vaadin-tests/test-root-context && ../../../mvnw -Dfailsafe.rerunFailingTestsCount=3 -DverticleStartTimeout=60000 verify
+      - run: >
+          cd vertx-vaadin-flow-parent/vertx-vaadin-tests/test-root-context &&
+          ../../../mvnw -Dfailsafe.rerunFailingTestsCount=3 -DverticleStartTimeout=60000 verify
       - save_cache:
           paths:
             - ~/.vaadin
