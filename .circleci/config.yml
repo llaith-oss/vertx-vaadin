@@ -111,7 +111,7 @@ jobs:
           command: ./mvnw -N install && ./mvnw -Prelease-flow install -DskipTests -DskipVertxRun=true
       - run: >
           cd vertx-vaadin-flow-parent/vertx-vaadin-tests/test-root-context &&
-          $(WKDIR)/mvnw -Dfailsafe.rerunFailingTestsCount=3 -DverticleStartTimeout=60000 verify
+          $WKDIR/mvnw -Dfailsafe.rerunFailingTestsCount=3 -DverticleStartTimeout=60000 verify
       - save_cache:
           paths:
             - ~/.vaadin
