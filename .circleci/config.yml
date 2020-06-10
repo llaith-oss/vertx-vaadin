@@ -84,13 +84,49 @@ jobs:
             - v2-dependencies-
       - run: ./mvnw -Prelease,release-flow -pl :vaadin-flow-sockjs,:vertx-vaadin-flow -DskipTests clean deploy
       - run: ./tools/build_flow_widgetsets.sh deploy
-
+  ui-tests:
+    docker:
+      - image: circleci/openjdk:8-jdk-browsers
+    working_directory: ~/repo
+    environment:
+      # Customize the JVM maximum heap limit
+      MAVEN_OPTS: -Xmx1024m
+      MAVEN_CONFIG: "-s .circleci/.circleci.settings.xml"
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v2-dependencies-{{ checksum "pom.xml" }}
+            - v2-dependencies-
+            - dot-vaadin
+      - run: cd vertx-vaadin-flow-parent/vertx-vaadin-tests/test-root-context
+      - run: ../../../mvnw -Dfailsafe.rerunFailingTestsCount=3 -DverticleStartTimeout=60000 verify
+      - save_cache:
+          paths:
+            - ~/.vaadin
+          key: dot-vaadin
+          when: always
+      - run:
+          name: Save test results
+          command: |
+            mkdir -p ~/junit-uitests/
+            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/junit-uitests/ \;
+            find . -type f -regex ".*/target/failsafe-reports/.*xml" -exec cp {} ~/junit-uitests/ \;
+          when: always
+      - store_test_results:
+          path: ~/junit-uitests
+      - store_artifacts:
+          path: ~/junit-uitests
 
 workflows:
   version: 2
   build-only:
     jobs:
       - build
+      - ui-test:
+          filters:
+            branches:
+              only: /^.*ui_tests.*/
   build-deploy:
     jobs:
       - build:
