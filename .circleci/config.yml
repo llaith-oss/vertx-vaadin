@@ -91,7 +91,6 @@ jobs:
     environment:
       # Customize the JVM maximum heap limit
       MAVEN_OPTS: -Xmx1024m
-      MAVEN_CONFIG: "-s .circleci/.circleci.settings.xml"
 
     steps:
       - checkout
