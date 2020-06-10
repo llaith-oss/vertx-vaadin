@@ -123,7 +123,7 @@ workflows:
   build-only:
     jobs:
       - build
-      - ui-test:
+      - ui-tests:
           filters:
             branches:
               only: /^.*ui_tests.*/
